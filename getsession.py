@@ -18,6 +18,21 @@ def valid_ip(address):
     except:
         return False
 
+def getOtherAttrib(otherd):
+    #Crude split of other attribs field
+    otherdata = otherd.split(":!:")
+    d = dict()
+    for x in range(len(otherdata)):
+        itemCount = len(otherdata[x].split("="))
+        if itemCount == 2:
+            subdata = otherdata[x].split("=")
+            #print("  {0} : {1}".format(subdata[0],subdata[1]))
+            if len(subdata[0]) != 0 and len(subdata[1]) != 0:
+                k = subdata[0]
+                v = subdata[1]
+                d[k] = v
+    return d
+
 env1 = "ISE_USER"
 env2 = "ISE_PASS"
 env3 = "ISE_PSN"
@@ -96,12 +111,19 @@ if 'sessionParameters' in data:
         result['cpmSessionID'] = subdata['cpmsession_id']
     if 'auth_id' in subdata:
         result['AuthID'] = subdata['auth_id']
-    '''
     if 'other_attr_string' in subdata:
-        other = str(subdata['other_attr_string'])
-        other = other.replace(':!:','',1)
-        print(f'{other}\n---\n')
-    ''' 
+        #otheratt = str(subdata['other_attr_string'])
+        others = getOtherAttrib(str(subdata['other_attr_string']))
+        if 'LogicalProfile' in others:
+            result['LogicalProfile'] = others['LogicalProfile']
+        if 'ISEPolicySetName' in others:
+            result['ISEPolicySetName'] = others['ISEPolicySetName']
+        if 'IdentityPolicyMatchedRule' in others:
+            result['MatchedIdentityRule'] = others['IdentityPolicyMatchedRule']
+        if 'AuthorizationPolicyMatchedRule' in others:
+            result['MatchedAuthzRule'] = others['AuthorizationPolicyMatchedRule']
+
+
 
 print(f'\n\n')
 #Print results dict 
